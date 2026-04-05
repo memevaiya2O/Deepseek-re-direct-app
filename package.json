@@ -1,11 +1,10 @@
 {
   "name": "my-deepseek-app",
   "version": "1.0.0",
+  "main": "server.js",
   "scripts": {
-  "start": "node server.js",
-  "render-build": "npm install && npx playwright install firefox"
-  }
-  
+    "start": "node server.js",
+    "render-build": "npm install && npx playwright install firefox"
   },
   "dependencies": {
     "express": "^4.19.2",
