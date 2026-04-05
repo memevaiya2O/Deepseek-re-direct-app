@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Prime Xyron</title>
+    <style>
+        body { background: #0b0c10; color: #66fcf1; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .glass-panel { background: rgba(31, 40, 51, 0.6); backdrop-filter: blur(10px); padding: 40px; border-radius: 15px; border: 1px solid #45a29e; box-shadow: 0 0 20px rgba(102, 252, 241, 0.2); width: 320px; }
+        h2 { text-align: center; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: rgba(0,0,0,0.5); border: 1px solid #45a29e; color: #fff; border-radius: 5px; outline: none; box-sizing: border-box; }
+        input:focus { border-color: #66fcf1; box-shadow: 0 0 5px #66fcf1; }
+        button { width: 100%; padding: 12px; background: #45a29e; color: #0b0c10; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 15px; transition: 0.3s; }
+        button:hover { background: #66fcf1; box-shadow: 0 0 10px #66fcf1; }
+        #status { text-align: center; margin-top: 15px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="glass-panel">
+        <h2>System Admin</h2>
+        <input type="email" id="email" placeholder="DeepSeek Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button onclick="saveConfig()">Initialize</button>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        async function saveConfig() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const status = document.getElementById('status');
+            
+            status.innerText = "Connecting...";
+            
+            try {
+                const res = await fetch('/api/save-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                status.innerText = data.message || data.error;
+            } catch(e) {
+                status.innerText = "Connection failed.";
+            }
+        }
+    </script>
+</body>
+</html>
