@@ -3,47 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Prime Xyron</title>
+    <title>Session Admin | Prime Xyron</title>
     <style>
-        body { background: #0b0c10; color: #66fcf1; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .glass-panel { background: rgba(31, 40, 51, 0.6); backdrop-filter: blur(10px); padding: 40px; border-radius: 15px; border: 1px solid #45a29e; box-shadow: 0 0 20px rgba(102, 252, 241, 0.2); width: 320px; }
-        h2 { text-align: center; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: rgba(0,0,0,0.5); border: 1px solid #45a29e; color: #fff; border-radius: 5px; outline: none; box-sizing: border-box; }
-        input:focus { border-color: #66fcf1; box-shadow: 0 0 5px #66fcf1; }
-        button { width: 100%; padding: 12px; background: #45a29e; color: #0b0c10; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 15px; transition: 0.3s; }
-        button:hover { background: #66fcf1; box-shadow: 0 0 10px #66fcf1; }
-        #status { text-align: center; margin-top: 15px; font-size: 14px; }
+        :root { --neon: #00f2ff; --bg: #050505; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); padding: 30px; border-radius: 20px; border: 1px solid rgba(0, 242, 255, 0.3); box-shadow: 0 0 30px rgba(0, 242, 255, 0.1); width: 400px; text-align: center; }
+        h2 { color: var(--neon); text-transform: uppercase; letter-spacing: 3px; font-size: 1.2rem; }
+        textarea { width: 100%; height: 150px; background: rgba(0,0,0,0.4); border: 1px solid #333; color: #00f2ff; padding: 10px; border-radius: 10px; margin: 15px 0; font-family: monospace; font-size: 12px; resize: none; outline: none; }
+        button { background: var(--neon); color: #000; border: none; padding: 12px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; }
+        button:hover { box-shadow: 0 0 15px var(--neon); transform: translateY(-2px); }
+        #log { margin-top: 15px; font-size: 13px; color: #aaa; }
+        .hint { font-size: 11px; color: #666; margin-top: 10px; text-align: left; }
     </style>
 </head>
 <body>
-    <div class="glass-panel">
-        <h2>System Admin</h2>
-        <input type="email" id="email" placeholder="DeepSeek Email" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button onclick="saveConfig()">Initialize</button>
-        <p id="status"></p>
-    </div>
 
-    <script>
-        async function saveConfig() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const status = document.getElementById('status');
-            
-            status.innerText = "Connecting...";
-            
-            try {
-                const res = await fetch('/api/save-config', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-                const data = await res.json();
-                status.innerText = data.message || data.error;
-            } catch(e) {
-                status.innerText = "Connection failed.";
+<div class="glass">
+    <h2>Session Injector</h2>
+    <p style="font-size: 12px; color: #888;">Paste DeepSeek JSON Cookies below</p>
+    <textarea id="cookies" placeholder='[{"name": "session", "value": "..."}]'></textarea>
+    <button onclick="inject()">Inject & Wake Up</button>
+    <div id="log">Status: Awaiting Input...</div>
+    <div class="hint">
+        <b>কিভাবে কুকি পাবেন?</b><br>
+        ১. Chrome-এ DeepSeek লগইন করুন।<br>
+        ২. "EditThisCookie" এক্সটেনশন দিয়ে Export JSON করুন।<br>
+        ৩. এখানে পেস্ট করে দিন।
+    </div>
+</div>
+
+<script>
+    async function inject() {
+        const cookieData = document.getElementById('cookies').value;
+        const log = document.getElementById('log');
+        
+        if(!cookieData) return alert("Please paste cookies first!");
+        
+        log.innerText = "Processing Session...";
+        
+        try {
+            const res = await fetch('/api/inject-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cookies: cookieData })
+            });
+            const data = await res.json();
+            if(data.success) {
+                log.style.color = "#00ff88";
+                log.innerText = "SUCCESS: " + data.message;
+            } else {
+                log.style.color = "#ff4444";
+                log.innerText = "ERROR: " + data.error;
             }
+        } catch(e) {
+            log.innerText = "Connection Failed.";
         }
-    </script>
+    }
+</script>
+
 </body>
 </html>
